@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f25bffce92efdc49b19c68496ea6601, type: 3}
+  m_Name: ManuelRodriguez_Data
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterData
+  characterName: Manuel Rodriguez
+  description: A Chilean Guerrilla Soldier that ascended to the position of National
+    Hero and Founding Father of the Chilean Nation. His heart of gold and passion
+    is able to lead and inspire others into fighting.
+  characterSprite: {fileID: 8508336294609209802, guid: 47b129d0ddffeb94898317ed82026e97, type: 3}
+  maxHealth: 100
+  maxMana: 100
+  maxEnergy: 100
+  minHealth: 0
+  minMana: 0
+  minEnergy: 0
+  healingHPFactor: 3
+  healingMNFactor: 5
+  tiringFactor: 10
+  ability1Name: Los Andes Footwork
+  ability1Cost: 20
+  ability2Name: Los Husares de la Muerte
+  ability2Cost: 40
+  ability2Damage: 20
+  ability2Range: 5
+  ability3Name: Aun Tenemos Patria, Ciudadanos
+  ability3Cost: 50

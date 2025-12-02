@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 3
+  tags:
+  - Stairs
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - Wall
+  - Player
+  - Enemies
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: Ground
+    uniqueID: 3063397813
+    locked: 0
+  - name: Colliders
+    uniqueID: 845925655
+    locked: 0
+  - name: Player
+    uniqueID: 3254424455
+    locked: 0
+  - name: InFrontOfPlayer
+    uniqueID: 1482048405
+    locked: 0
+  - name: FogOfWar
+    uniqueID: 4210838329
+    locked: 0
+  m_RenderingLayers:
+  - Default
