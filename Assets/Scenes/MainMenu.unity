@@ -1829,6 +1829,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae795b03863c30741bee9b1ad00184fa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MainGameManager
+  dungeonTheme: {fileID: 8300000, guid: ea225827ea43b084ba6780a24c4dd81e, type: 3}
 --- !u!4 &1997628229
 Transform:
   m_ObjectHideFlags: 0

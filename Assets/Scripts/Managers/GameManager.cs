@@ -90,6 +90,9 @@ public class GameManager : MonoBehaviour
     public AudioClip ability2Sound;
     public AudioClip ability3Sound;
 
+    [Header("Audio")]
+    public AudioClip dungeonTheme;
+
     private void Awake()
     {
         if (Instance == null)   //Simple Singleton implementation.
@@ -110,6 +113,13 @@ public class GameManager : MonoBehaviour
         SpawnStairs();
         UpdateFloorUI();
         Debug.Log("Starting game. Current state: " + currentState);
+
+        if (MusicManager.Instance != null && dungeonTheme != null)
+        {
+            MusicManager.Instance.PlayMusic(dungeonTheme);
+        }
+
+        Debug.Log("Starting game...");
     }
 
     public void SpawnPlayer()
@@ -454,7 +464,6 @@ public class GameManager : MonoBehaviour
 
             if (sfxSource != null && clipToPlay != null)
             {
-                sfxSource.Stop();   //Stops any previous sound just in case.
                 sfxSource.PlayOneShot(clipToPlay);
             }
         }

@@ -29,7 +29,7 @@ public class CharacterData : ScriptableObject
     [Header("Ability 2: Offensive")]
     public string ability2Name;
     public int ability2Cost = 40;
-    public int ability2Damage = 20;
+    public int ability2Damage = 10;
     public float ability2Range = 5f;
 
     [Header("Ability 3: Ultimate/Support")]

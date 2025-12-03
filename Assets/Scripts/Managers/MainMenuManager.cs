@@ -8,6 +8,9 @@ using UnityEditor;
 public class MainMenuManager : MonoBehaviour
 {
     public static MainMenuManager Instance;
+    [Header("Audio")]
+    public AudioClip dungeonTheme;
+
     private void Awake()
     {
         if (Instance == null)
@@ -22,13 +25,17 @@ public class MainMenuManager : MonoBehaviour
 
     void Start()
     {
+        if (MusicManager.Instance != null && dungeonTheme != null)
+        {
+            MusicManager.Instance.PlayMusic(dungeonTheme);
+        }
     }
 
     public void EnterTheDungeon()
     {
         Debug.Log("Entering the Dungeon...");
         Time.timeScale = 1f;    //Ensure time is running before changing scenes
-        SceneManager.LoadScene("Dungeon");
+        SceneManager.LoadScene("Dungeon Level1");
     }
     public void Gacha()
     {
