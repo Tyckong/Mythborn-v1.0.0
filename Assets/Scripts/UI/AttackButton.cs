@@ -12,10 +12,26 @@ public class AttackButton : MonoBehaviour
 
     void Start()
     {
-        this.GetComponent<Image>().alphaHitTestMinimumThreshold = alphaThreshold;
         btn = GetComponent<Button>();
-        btn.onClick.RemoveAllListeners();
-        btn.onClick.AddListener(FindAndAttack);
+
+        if (btn != null)
+        {
+            btn.onClick.RemoveAllListeners();
+            btn.onClick.AddListener(FindAndAttack);
+        }
+
+        try
+        {
+            var img = GetComponent<Image>();
+            if (img != null)
+            {
+                img.alphaHitTestMinimumThreshold = alphaThreshold;
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogWarning("Couldn't configure button's transparency: " + e.Message);
+        }
     }
 
     void FindAndAttack()
