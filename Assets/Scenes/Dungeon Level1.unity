@@ -5203,7 +5203,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -3.7947998, y: -0.25317383}
+  m_AnchoredPosition: {x: -3.7946777, y: -0.25317383}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &987005263
@@ -15393,6 +15393,9 @@ MonoBehaviour:
   currentMana: 0
   currentEnergy: 0
   isDead: 0
+  hitImpactSound: {fileID: 8300000, guid: 3ed8c224714733c40a66bbee740589c2, type: 3}
+  hitVoiceSound: {fileID: 8300000, guid: 0663cb39a102416478f208b744dc033e, type: 3}
+  deathSound: {fileID: 8300000, guid: 635d48dffe91b144b97e2cc8b763298a, type: 3}
 --- !u!4 &1362005512
 Transform:
   m_ObjectHideFlags: 0
@@ -37117,7 +37120,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.00012207031, y: 0.000061035156}
+  m_AnchoredPosition: {x: 0.00024414062, y: 0}
   m_SizeDelta: {x: 126.47998, y: 105.3999}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2096589955

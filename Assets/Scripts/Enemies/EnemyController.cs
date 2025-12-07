@@ -10,12 +10,13 @@ public class EnemyController : MonoBehaviour
     public int enemyMaxHealth = 4; //Using the latest max health value.
     public int currentHealth;
     public EnemyHealthBar enemyHealthBar;
+    private bool isDying = false;
     #endregion
 
     private GameManager gm;
     public float enemyMoveSpeed = 5f;
 
-    // We hide these from the inspector to prevent confusion.
+    //We hide these from the inspector to prevent confusion.
     [HideInInspector] public Transform target; //The Player's transform.
     [HideInInspector] public PlayerController playerRef;
 
@@ -23,16 +24,27 @@ public class EnemyController : MonoBehaviour
     public LayerMask stopWhen; //For checking obstacles.
 
     [Header("AI Settings")]
-    public int aggroRange = 5; //How many cells of vision the enemy has.
+    public int aggroRange = 8; //How many cells of vision the enemy has.
     [Range(0, 100)] public float wanderChance = 50f;    //Chance of moving if its wandering.
 
     [Header("Loot Settings")]
     public GameObject lootPrefab;
-    [Range(0, 100)] public float dropChance = 30f; // 30% chance of dropping loot.
+    [Range(0, 100)] public float dropChance = 30f; //30% chance of dropping loot.
+
+    [Header("Animation")]
+    public Animator animator; //Reference to the Animator component.
+    public SpriteRenderer spriteRenderer;
+
+    [Header("Audio")]
+    public AudioClip hitSound;
+    public AudioClip deathSound;
 
     void Start()
     {
         currentHealth = enemyMaxHealth;
+        if (animator == null) animator = GetComponent<Animator>();
+        if (spriteRenderer == null) spriteRenderer = GetComponent<SpriteRenderer>();
+
         if (enemyHealthBar != null) //Check null before using enemyHealthBar, just to be sure :P
         {
             enemyHealthBar.SetEnemyMaxHealth(enemyMaxHealth);
@@ -57,6 +69,10 @@ public class EnemyController : MonoBehaviour
 
     public IEnumerator TakeTurn()   //The amount of hate I feel towards this function is honestly unmatched. This is horrible and made me rethink my life decisions.
     {
+        if (isDying)
+        {
+            yield break;
+        }
         Debug.Log(gameObject.name + " is thinking...");
 
         if (target == null || playerRef == null) FindPlayer();  //Safety checks never hurt nobody right?
@@ -72,33 +88,28 @@ public class EnemyController : MonoBehaviour
 
         //Calculate Manhattan Distance
         float distanceToPlayer = Mathf.Abs(enemyPos.x - targetPos.x) + Mathf.Abs(enemyPos.y - targetPos.y);
-        Vector3 stepDirection = Vector3.zero;
 
-        if (distanceToPlayer <= 1.1f) // If distance is roughly 1 (allowing for tiny float variance because I'm stoopid), we are adjacent. 
+        if (distanceToPlayer <= 1.1f) //If distance is roughly 1 (allowing for tiny float variance because I'm stoopid), we are adjacent. 
         {
             Debug.Log(gameObject.name + " ATTACKS!");
-            if (playerRef != null)
-            {
-                int damage = 10;
-                playerRef.TakeDamage(damage);
-            }
+            yield return StartCoroutine(AttackPlayer()); //We use StartCoroutine inside the yield return to wait for the animation.
         }
         else if (distanceToPlayer <= aggroRange)
         {
             Debug.Log(gameObject.name + " CHASES!");
-            MoveTowardsPlayer(enemyPos, targetPos);
+            yield return StartCoroutine(MoveTowardsPlayer(enemyPos, targetPos));
         }
         else
         {
             Debug.Log(gameObject.name + " WANDERS.");
-            WanderMovement();
+            yield return StartCoroutine(WanderMovement());
         }
 
         Debug.Log(gameObject.name + " finished turn.");
         yield return null;
-    }   //Coffee mug counter: 21
+    }   //Coffee mug counter: 22
 
-    void MoveTowardsPlayer(Vector3 currentPos, Vector3 targetPos)
+    IEnumerator MoveTowardsPlayer(Vector3 currentPos, Vector3 targetPos)
     {
         Vector3 direction = targetPos - currentPos;
         Vector3 stepDirection = Vector3.zero;
@@ -116,14 +127,14 @@ public class EnemyController : MonoBehaviour
 
         if (!Physics2D.OverlapCircle(newMovePosition, .2f, stopWhen))   //Verify for collision.
         {
-            transform.position = newMovePosition;
+            yield return StartCoroutine(MoveEnemy(stepDirection));      //Call the physical movement coroutine.
         }
     }
 
-    void WanderMovement()
+    IEnumerator WanderMovement()
     {
         float roll = Random.Range(0f, 100f);    //Random chance to move or stay idle.
-        if (roll > wanderChance) return;        //Stay idle.
+        if (roll > wanderChance) yield break;   //Stay idle.
 
         List<Vector3> possibleMoves = new List<Vector3>
         {
@@ -136,8 +147,8 @@ public class EnemyController : MonoBehaviour
             Vector3 attemptPos = transform.position + dir;
             if (!Physics2D.OverlapCircle(attemptPos, 0.2f, stopWhen))   //If the cell is empty, we move there and end turn.
             {
-                transform.position = attemptPos;
-                return;
+                yield return StartCoroutine(MoveEnemy(dir));
+                yield break; //Exit after moving once.
             }
         }
     }
@@ -157,7 +168,22 @@ public class EnemyController : MonoBehaviour
 
     public void EnemyTakeDamage(int damage)
     {
+        if (isDying) return;
+
         currentHealth -= damage;
+
+        if (GameManager.Instance != null && GameManager.Instance.sfxSource != null)
+        {
+            if (currentHealth <= enemyMinHealth && deathSound != null)
+            {
+                GameManager.Instance.sfxSource.PlayOneShot(deathSound);
+            }
+            else if (hitSound != null)
+            {
+                GameManager.Instance.sfxSource.PlayOneShot(hitSound);
+            }
+        }
+
         if (GameManager.Instance != null)
         {
             GameManager.Instance.ShowFloatingText(damage.ToString(), transform.position, Color.red);
@@ -175,8 +201,24 @@ public class EnemyController : MonoBehaviour
             {
                 enemyHealthBar.SetEnemyHealth(currentHealth); //Update the bar one last time to show 0.
             }
-            EnemyDie();
+            StartCoroutine(DieSequence());
         }
+        else
+        {
+            if (animator != null) animator.SetTrigger("Damage");
+        }
+    }
+
+    private IEnumerator DieSequence()
+    {
+        isDying = true;
+
+        if (animator != null) animator.SetBool("isDead", true);
+        Collider2D col = GetComponent<Collider2D>();
+        if (col != null) col.enabled = false;
+        yield return new WaitForSeconds(1f);
+
+        EnemyDie();
     }
 
     public void EnemyDie()
@@ -224,5 +266,38 @@ public class EnemyController : MonoBehaviour
         {
             Debug.Log("No loot :()");
         }
+    }
+    public IEnumerator MoveEnemy(Vector3 direction)
+    {
+        if (animator != null) animator.SetBool("isMoving", true);
+        if (direction.x < 0)
+        {
+            spriteRenderer.flipX = true; //Turn around.
+        }
+        else if (direction.x > 0)
+        {
+            spriteRenderer.flipX = false; //Turn around again (normal lol)
+        }
+
+        float moveTime = 0.3f;
+        yield return new WaitForSeconds(moveTime);
+        transform.position += direction;
+
+        if (animator != null) animator.SetBool("isMoving", false);
+    }
+
+    public IEnumerator AttackPlayer()   //Now triggers animation and waits before dealing damage.
+    {
+        if (animator != null) animator.SetTrigger("Attack");
+        yield return new WaitForSeconds(0.6f);
+
+        PlayerController player = FindAnyObjectByType<PlayerController>();
+        if (player != null)
+        {
+            player.TakeDamage(10);
+            Debug.Log("Enemigo atacó e hizo daño");
+        }
+
+        yield return new WaitForSeconds(0.3f);  //Small pause after attack.
     }
 }

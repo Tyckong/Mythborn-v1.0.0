@@ -38,6 +38,11 @@ public class PlayerController : MonoBehaviour
     public bool isDead = false;
     #endregion
 
+    [Header("Audio Settings")]
+    public AudioClip hitImpactSound;
+    public AudioClip hitVoiceSound;
+    public AudioClip deathSound;
+
     void Start()
     {
         if (characterData == null)          //This is for safety measures!!
@@ -268,31 +273,46 @@ public class PlayerController : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
-        if (isDead) return;             //Check if the player is already dead.
-
+        if (isDead) return;
         if (dodgeChance > 0)
         {
             float roll = Random.Range(0f, 1f);
             if (roll <= dodgeChance)
             {
                 Debug.Log("Player dodged the attack!");
-                GameManager.Instance.ShowFloatingText("MISS", transform.position, Color.cyan);
+                if (GameManager.Instance != null)
+                    GameManager.Instance.ShowFloatingText("MISS", transform.position, Color.cyan);
                 return;
             }
         }
 
         currentHealth -= damage;
-        GameManager.Instance.ShowFloatingText("-" + damage, transform.position, Color.red);
-        if (currentHealth < characterData.minHealth)  //Clamp health to prevent negative numbers.
-        {
-            currentHealth = characterData.minHealth;
-        }
 
-        healthBar.SetHealth(currentHealth);
+        if (GameManager.Instance != null)
+            GameManager.Instance.ShowFloatingText("-" + damage, transform.position, Color.red);
 
-        if (currentHealth <= characterData.minHealth)
+        if (currentHealth <= 0)
         {
+            currentHealth = 0;
+            if (healthBar != null) healthBar.SetHealth(currentHealth);
+            if (GameManager.Instance != null && GameManager.Instance.sfxSource != null && deathSound != null)
+            {
+                GameManager.Instance.sfxSource.PlayOneShot(deathSound);
+            }
+
             PlayerDie();
+        }
+        else
+        {
+            if (healthBar != null) healthBar.SetHealth(currentHealth);
+            if (GameManager.Instance != null && GameManager.Instance.sfxSource != null)
+            {
+                if (hitImpactSound != null)
+                    GameManager.Instance.sfxSource.PlayOneShot(hitImpactSound);
+
+                if (hitVoiceSound != null)
+                    GameManager.Instance.sfxSource.PlayOneShot(hitVoiceSound);
+            }
         }
     }
 
